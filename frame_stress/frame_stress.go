@@ -4,6 +4,8 @@ import (
 	"flag"
 	"net/url"
 	stress "github.com/amarburg/go-lazycache-benchmarking"
+	"math/rand"
+	"time"
 )
 
 var hostFlag = flag.String("host", "127.0.0.1:5000", "Host to query")
@@ -21,6 +23,8 @@ imageUrl := url.URL{
 	Host: *hostFlag,
 	Path: *pathFlag,
 }
+
+rand.Seed( time.Now().UTC().UnixNano())
 
 	err := stress.FrameStress( stress.SetCount( *countFlag ),
  															stress.SetParallelism( *parallelismFlag ),
