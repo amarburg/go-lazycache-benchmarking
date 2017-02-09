@@ -11,19 +11,9 @@ import (
 
 func RandomWalk( opts ...StressOption ) error {
 
-  settings := &stressSettings {
-  urls: make( []string, 0 ),
-  count: 0,
-  parallelism: 0,
-  }
+  settings := NewSettings()
+  if err := settings.Apply( opts... ); err != nil { return nil }
 
-  for _,f := range opts {
-    f.Apply(settings)
-  }
-
-  if len(settings.urls) < 1 {
-    return errors.New("No valid image urls specified")
-  }
 
   var urls = make(chan string, settings.count )
   var out = make(chan bool)

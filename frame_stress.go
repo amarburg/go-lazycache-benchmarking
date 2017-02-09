@@ -6,7 +6,6 @@ import (
   "encoding/json"
   "math/rand"
   "sync"
-  "errors"
   "io/ioutil"
 )
 
@@ -17,20 +16,8 @@ var wg sync.WaitGroup
 
 func FrameStress( opts ...StressOption ) error {
 
-  settings := &stressSettings {
-  urls: make( []string, 0 ),
-  count: 0,
-  parallelism: 0,
-  }
-
-  for _,f := range opts {
-    f.Apply(settings)
-  }
-
-  if len(settings.urls) < 1 {
-    return errors.New("No valid image urls specified")
-  }
-
+  settings := NewSettings()
+  if err := settings.Apply( opts... ); err != nil { return nil }
 
   lengths := make( []int, len(settings.urls) )
 
