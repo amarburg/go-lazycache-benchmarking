@@ -9,19 +9,20 @@ import (
   "math/rand"
 )
 
-func RandomWalk( opts ...StressOption ) error {
+func RandomWalk( opts StressOptions, baseurl string ) error {
 
-  settings := NewSettings()
-  if err := settings.Apply( opts... ); err != nil { return nil }
+  count := opts.Count()
+  parallelism := opts.Parallelism()
 
+  if parallelism > count {
+    fmt.Printf("Count %d less than parallelism %d, setting parallelism to %d\n", count, parallelism, count )
+    parallelism = count
+  }
 
-  var urls = make(chan string, settings.count )
+  var urls = make(chan string, count )
   var out = make(chan bool)
 
-  baseurl := settings.urls[0]
-
-
-	for i := 0; i < settings.parallelism; i++ {
+	for i := 0; i < parallelism; i++ {
 		go RandomWalkQuery(urls,out, baseurl)
     urls <- baseurl
 	}
@@ -41,7 +42,7 @@ func RandomWalk( opts ...StressOption ) error {
 
 		if !resp {
 			return errors.New("Error from child")
-		} else if i > settings.count {
+		} else if i > count {
 			return nil
 		}
 	}

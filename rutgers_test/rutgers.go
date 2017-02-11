@@ -1,19 +1,41 @@
 package main
 
 import (
-	"fmt"
 	"github.com/amarburg/go-lazycache-benchmarking"
-	"os"
+  "math/rand"
+  flag "github.com/spf13/pflag"
 )
+
+
+type UrlList struct {
+  urls     []string
+}
+
+func (list UrlList) Url( i int ) string {
+  return list.urls[rand.Intn(len(list.urls))]
+}
 
 func main() {
 
-	settings, err := lazycache_benchmarking.StressFlags(
-                      lazycache_benchmarking.SetUrls( []string{"https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T000000Z.mp4"} ))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
+  list := UrlList{
+    []string{
+      "https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T000000Z.mov",
+      "https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T030000Z.mov",
+      "https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T060000Z.mov",
+      "https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T090000Z.mov",
+      "https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T120000Z.mov",
+      "https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T150000Z.mov",
+      "https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T180000Z.mov",
+      "https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/2016/07/01/CAMHDA301-20160701T210000Z.mov",
+    },
+  }
 
-	lazycache_benchmarking.RepeatedDownload(settings)
+  opts := lazycache_benchmarking.NewSettings()
+
+  set := flag.NewFlagSet("", flag.ExitOnError)
+	lazycache_benchmarking.AddStressFlags(set)
+  set.Parse(flag.Args())
+  opts.ApplyFlags(set)
+
+	lazycache_benchmarking.RepeatedDownload(opts, list )
 }
