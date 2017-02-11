@@ -6,15 +6,14 @@ import (
   "encoding/json"
   "math/rand"
   "sync"
-  "io/ioutil"
 )
 
-var wg sync.WaitGroup
 
 
 
 
 func FrameStress( opts ...StressOption ) error {
+  var wg sync.WaitGroup
 
   settings := NewSettings()
   if err := settings.Apply( opts... ); err != nil { return nil }
@@ -45,11 +44,12 @@ func FrameStress( opts ...StressOption ) error {
   }
 
   var urls = make(chan string )
+  var results = make( chan []byte, settings.count )
 
   wg.Add( settings.parallelism )
 
 	for i := 0; i < settings.parallelism; i++ {
-		go FrameStressWorker(urls)
+		go DownloadWorker(urls, results, &wg)
 	}
 
   for i := 0; i < settings.count; i ++ {
@@ -57,39 +57,12 @@ func FrameStress( opts ...StressOption ) error {
     urls <- fmt.Sprintf("%s/frame/%d", settings.urls[c], rand.Intn(  lengths[c] ) )
   }
 
+  // Drop results
+
   close(urls)
   fmt.Printf("Waiting for workers to finish...")
   wg.Wait()
   fmt.Printf("done\n")
 
   return nil
-}
-
-func FrameStressWorker(urls chan string) {
-	fmt.Println("In random walker")
-	for {
-
-    url,ok := <- urls
-
-    if !ok {
-      //fmt.Println("Channel closed, quitting")
-      wg.Done()
-      return
-    }
-
-		fmt.Println("Random walker Querying URL", url)
-
-		resp, err := http.Get(url)
-		if err != nil {
-			fmt.Printf("%d: ERROR: %s\n", url, err)
-			fmt.Printf("Error making request: %s\n", err.Error())
-		}
-
-    //
-		defer resp.Body.Close()
-	 ioutil.ReadAll(resp.Body)
-
-
-	}
-
 }

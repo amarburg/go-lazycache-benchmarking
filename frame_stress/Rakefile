@@ -1,0 +1,5 @@
+
+
+task :local_stress do
+  sh "./frame_stress -host 127.0.0.1:5000 -count 1000 -parallelism 1"
+end
