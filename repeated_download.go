@@ -5,7 +5,6 @@ import (
   "sync"
   "fmt"
   "bytes"
-    "io/ioutil"
     "net/http"
     "time"
     "encoding/json"
@@ -88,7 +87,11 @@ func RepeatedDownload( settings *StressOptions,
 
       //
   		defer resp.Body.Close()
-  	 ioutil.ReadAll(resp.Body)
+
+      mb := make( []byte, 1024*1024 )
+      for {
+        if _,err = resp.Body.Read(mb); err != nil { break }
+      }
       duration := time.Since(start)
 
       // fmt.Println("Done fetching ", url, " elapsed ", duration )
