@@ -21,7 +21,7 @@ type StressOptions struct {
 func (opt StressOptions) Count() int { return opt.count }
 func (opt StressOptions) Parallelism() int { return opt.parallelism }
 
-func (opt *StressOptions) setCount( i int ) { opt.parallelism = i }
+func (opt *StressOptions) setCount( i int ) { opt.count = i }
 func (opt *StressOptions) setParallelism( i int ) { opt.parallelism = i }
 
 
@@ -61,12 +61,12 @@ func NewSettings() *StressOptions {
 func AddStressFlags( set *flag.FlagSet) (*flag.FlagSet) {
 
   set.String("host", "127.0.0.1:5000", "Host to query")
-    set.String("path", "/org/oceanobservatories/rawdata/files/", "Root path to query")
+  set.String("path", "/org/oceanobservatories/rawdata/files/", "Root path to query")
 
-    set.Int("count", 1, "Number of queries to make")
-    set.Int("parallelism", 5, "Parallelism of  queries")
+  set.Int("count", 1, "Number of queries to make")
+  set.Int("parallelism", 5, "Parallelism of  queries")
 
-return set
+  return set
 }
 
 

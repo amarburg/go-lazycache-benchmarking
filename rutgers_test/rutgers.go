@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/amarburg/go-lazycache-benchmarking"
   "math/rand"
+  "fmt"
+  "os"
   flag "github.com/spf13/pflag"
 )
 
@@ -34,8 +36,12 @@ func main() {
 
   set := flag.NewFlagSet("", flag.ExitOnError)
 	lazycache_benchmarking.AddStressFlags(set)
-  set.Parse(flag.Args())
+
+  set.Parse( os.Args[1:])
+  fmt.Println(set)
   opts.ApplyFlags(set)
+
+fmt.Println(opts)
 
 	lazycache_benchmarking.RepeatedDownload(opts, list )
 }
