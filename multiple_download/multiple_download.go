@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/amarburg/go-lazycache-benchmarking"
+	stress "github.com/amarburg/go-lazycache-benchmarking"
   "math/rand"
   "fmt"
   "os"
@@ -32,16 +32,16 @@ func main() {
     },
   }
 
-  opts := lazycache_benchmarking.NewSettings()
+  opts := stress.NewSettings()
 
   set := flag.NewFlagSet("", flag.ExitOnError)
-	lazycache_benchmarking.AddStressFlags(set)
+	stress.AddStressFlags(set)
 
   set.Parse( os.Args[1:])
   fmt.Println(set)
   opts.ApplyFlags(set)
 
-fmt.Println(opts)
+	fmt.Println(opts)
 
-	lazycache_benchmarking.RepeatedDownload(opts, list )
+	stress.RepeatedDownload(opts, list )
 }
