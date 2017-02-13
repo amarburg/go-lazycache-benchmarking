@@ -45,10 +45,12 @@ func RepeatedDownload( settings *StressOptions,
     wg.Wait()
 
     fmt.Printf("Pulling results\n")
+    fmt.Println('[')
     for i := 0; i < count; i ++ {
       result := <- results
-      fmt.Println(bytes.NewBuffer(result).String())
+      fmt.Println(bytes.NewBuffer(result).String(),',')
     }
+    fmt.Println(']')
 
     return nil
   }
@@ -85,12 +87,17 @@ func RepeatedDownload( settings *StressOptions,
 
   		}
 
+    fmt.Println(resp)
+
       //
   		defer resp.Body.Close()
 
+      var bytesRead int64
       mb := make( []byte, 1024*1024 )
       for {
-        if _,err = resp.Body.Read(mb); err != nil { break }
+        n,err := resp.Body.Read(mb)
+        bytesRead += int64(n)
+        if err != nil { break }
       }
       duration := time.Since(start)
 
@@ -99,11 +106,13 @@ func RepeatedDownload( settings *StressOptions,
       buf,_ := json.Marshal( struct {
         Url string
         ContentLength int64
+        BytesRead      int64
         ElapsedTime   float64
         }{
-        url,
-        resp.ContentLength,
-        duration.Seconds(),
+        Url: url,
+        ContentLength: resp.ContentLength,
+        BytesRead:  bytesRead,
+        ElapsedTime: duration.Seconds(),
       } )
       results <- buf
 
