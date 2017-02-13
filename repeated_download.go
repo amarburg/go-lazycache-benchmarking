@@ -48,7 +48,7 @@ func RepeatedDownload( settings *StressOptions,
     fmt.Println('[')
     for i := 0; i < count; i ++ {
       result := <- results
-      fmt.Println(bytes.NewBuffer(result).String(),',')
+      fmt.Printf("%s,\n", bytes.NewBuffer(result).String())
     }
     fmt.Println(']')
 
