@@ -36,6 +36,7 @@ func RepeatedDownload( settings *StressOptions,
   		go DownloadWorker(urls, results, &wg)
   	}
 
+    start := time.Now()
     for i := 0; i < count; i ++ {
       urls <- producer.Url(i)
     }
@@ -44,13 +45,16 @@ func RepeatedDownload( settings *StressOptions,
     fmt.Printf("Waiting for workers to finish...\n")
     wg.Wait()
 
+    duration := time.Since( start )
+
     fmt.Printf("Pulling results\n")
-    fmt.Println("[")
+    fmt.Println("{ Data: [")
     for i := 0; i < count; i ++ {
       result := <- results
       fmt.Printf("%s,\n", bytes.NewBuffer(result).String())
     }
-    fmt.Println("]")
+    fmt.Println("],")
+    fmt.Printf("TotalTime: %f }\n", duration.Seconds() )
 
     return nil
   }
