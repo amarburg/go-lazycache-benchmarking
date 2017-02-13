@@ -48,13 +48,13 @@ func RepeatedDownload( settings *StressOptions,
     duration := time.Since( start )
 
     fmt.Printf("Pulling results\n")
-    fmt.Println("{ Data: [")
+    fmt.Println("{ \"Data\": [")
     for i := 0; i < count; i ++ {
       result := <- results
       fmt.Printf("%s,\n", bytes.NewBuffer(result).String())
     }
     fmt.Println("],")
-    fmt.Printf("TotalTime: %f }\n", duration.Seconds() )
+    fmt.Printf(\""TotalTime\": %f }\n", duration.Seconds() )
 
     return nil
   }
