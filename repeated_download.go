@@ -54,7 +54,7 @@ func RepeatedDownload( settings *StressOptions,
       fmt.Printf("%s,\n", bytes.NewBuffer(result).String())
     }
     fmt.Println("],")
-    fmt.Printf(\""TotalTime\": %f }\n", duration.Seconds() )
+    fmt.Printf("\"TotalTime\": %f }\n", duration.Seconds() )
 
     return nil
   }

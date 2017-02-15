@@ -9,7 +9,7 @@ import (
   "time"
 )
 
-var hostFlag = flag.String("host", "127.0.0.1:5000", "Host to query")
+var hostFlag = flag.String("host", "127.0.0.1:5000/v1", "Host to query")
 var pathFlag = flag.String("path", "/org/oceanobservatories/rawdata/files/", "Root path to query")
 
 var countFlag = flag.Int("count", 50, "Number of queries to make")

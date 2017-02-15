@@ -21,8 +21,8 @@ type StressOptions struct {
 func (opt StressOptions) Count() int { return opt.count }
 func (opt StressOptions) Parallelism() int { return opt.parallelism }
 
-func (opt *StressOptions) setCount( i int ) { opt.count = i }
-func (opt *StressOptions) setParallelism( i int ) { opt.parallelism = i }
+func (opt *StressOptions) SetCount( i int ) { opt.count = i }
+func (opt *StressOptions) SetParallelism( i int ) { opt.parallelism = i }
 
 
 
@@ -76,9 +76,9 @@ func (opt *StressOptions) ApplyFlags( set *flag.FlagSet ) {
   //   settings.Apply( SetHost( host ) )
   // }
 c,_ := set.GetInt("count")
-opt.setCount( c )
+opt.SetCount( c )
 
 p,_ := set.GetInt("parallelism")
-opt.setParallelism( p )
+opt.SetParallelism( p )
 
 }

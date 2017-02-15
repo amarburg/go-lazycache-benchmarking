@@ -57,7 +57,7 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	url := "%h/files/RS03ASHS/PN03B/06-CAMHDA301/2017/01/01/CAMHDA301-20170101T000500.mov"
-	host := "https://ferrous-ranger-158304.appspot.com/org/oceanobservatories/rawdata"
+	host := "https://ferrous-ranger-158304.appspot.com/v1/org/oceanobservatories/rawdata"
 
 	fullUrl := strings.Replace(url, "%h", host, 1)
 
