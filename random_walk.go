@@ -4,8 +4,8 @@ import (
   "fmt"
   "errors"
   "net/http"
-  "encoding/json"
-  "math/rand"
+  // "encoding/json"
+  // "math/rand"
 )
 
 func RandomWalk( opts StressOptions, baseurl string ) error {
@@ -67,24 +67,25 @@ func RandomWalkQuery(urls chan string, out chan bool, baseurl string) {
 		// body, _ := ioutil.ReadAll(resp.Body)
 		// fmt.Printf("%d: RESPONSE: %v\n%s\n", i, resp, body)
 
-		// Parse response
-		decoder := json.NewDecoder(resp.Body)
-		var listing listing_store.DirListing
-
-		if err := decoder.Decode(&listing); err != nil {
-			fmt.Println("Error reading response: %s\n", err.Error())
-			out <- false
-			return
-		}
-		//fmt.Printf("Has %d directories\n", len(listing.Directories))
-
-		if len(listing.Directories) > 0 {
-
-			urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
-			//urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
-		} else {
-      urls <- baseurl
-    }
+    // TODO:  Fix this
+		// // Parse response
+		// decoder := json.NewDecoder(resp.Body)
+		// var listing lazycache.DirListing
+    //
+		// if err := decoder.Decode(&listing); err != nil {
+		// 	fmt.Println("Error reading response: %s\n", err.Error())
+		// 	out <- false
+		// 	return
+		// }
+		// //fmt.Printf("Has %d directories\n", len(listing.Directories))
+    //
+		// if len(listing.Directories) > 0 {
+    //
+		// 	urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
+		// 	//urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
+		// } else {
+    //   urls <- baseurl
+    // }
 
 		//fmt.Println("Good response")
 		out <- true
