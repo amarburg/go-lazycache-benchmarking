@@ -5,7 +5,6 @@ import (
   "errors"
   "net/http"
   "encoding/json"
-  "github.com/amarburg/go-lazycache/listing_store"
   "math/rand"
 )
 
