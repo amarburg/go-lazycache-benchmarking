@@ -62,7 +62,7 @@ func RepeatedDownload( settings *StressOptions,
 
 
   func DownloadWorker(urls chan string, results chan []byte , wg *sync.WaitGroup) {
-  	//fmt.Println("In random walker")
+  	fmt.Println("In random walker")
   	for {
 
       url,ok := <- urls
@@ -73,7 +73,7 @@ func RepeatedDownload( settings *StressOptions,
         return
       }
 
-  		fmt.Println("Download worker Querying URL", url)
+  		fmt.Println("Download worker Querying URL:", url)
 
       start := time.Now()
   		resp, err := http.Get(url)
@@ -91,7 +91,7 @@ func RepeatedDownload( settings *StressOptions,
 
   		}
 
-    fmt.Println(resp)
+      fmt.Printf("Got response: %s\n", resp)
 
       //
   		defer resp.Body.Close()

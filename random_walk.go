@@ -18,6 +18,8 @@ func RandomWalk( opts StressOptions, baseurl string ) error {
     parallelism = count
   }
 
+  fmt.Printf("Random walk testing, count %d, parallelism %d\n", count, parallelism )
+
   var urls = make(chan string, count )
   var out = make(chan bool)
 
@@ -29,7 +31,7 @@ func RandomWalk( opts StressOptions, baseurl string ) error {
 
 	//urls <- fmt.Sprintf("http://%s/org/oceanobservatories/rawdata/files/RS03ASHS/PN03B/06-CAMHDA301/", host )
 
-	i := 0
+	i := 1
 	for {
 		fmt.Printf("Wait for task %d to complete ...", i)
 		resp := <-out // wait for one task to complete
@@ -41,7 +43,7 @@ func RandomWalk( opts StressOptions, baseurl string ) error {
 
 		if !resp {
 			return errors.New("Error from child")
-		} else if i > count {
+		} else if i >= count {
 			return nil
 		}
 	}
@@ -87,7 +89,7 @@ func RandomWalkQuery(urls chan string, out chan bool, baseurl string) {
     //   urls <- baseurl
     // }
 
-		//fmt.Println("Good response")
+		fmt.Println("Good response")
 		out <- true
 	}
 }
