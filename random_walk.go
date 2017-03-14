@@ -2,10 +2,12 @@ package lazycache_benchmarking
 
 import (
   "fmt"
+  "io"
   "errors"
+  //"io/ioutil"
   "net/http"
-  // "encoding/json"
-  // "math/rand"
+  "encoding/json"
+  "math/rand"
 )
 
 func RandomWalk( opts StressOptions, baseurl string ) error {
@@ -20,37 +22,40 @@ func RandomWalk( opts StressOptions, baseurl string ) error {
 
   fmt.Printf("Random walk testing, count %d, parallelism %d\n", count, parallelism )
 
-  var urls = make(chan string, count )
-  var out = make(chan bool)
+  var urls = make(chan string, parallelism )
+  defer close(urls)
+
+  var out = make(chan string)
 
 	for i := 0; i < parallelism; i++ {
 		go RandomWalkQuery(urls,out, baseurl)
     urls <- baseurl
 	}
 
-
 	//urls <- fmt.Sprintf("http://%s/org/oceanobservatories/rawdata/files/RS03ASHS/PN03B/06-CAMHDA301/", host )
 
-	i := 1
+	i := parallelism
 	for {
 		fmt.Printf("Wait for task %d to complete ...", i)
-		resp := <-out // wait for one task to complete
+		new_url := <-out // wait for one task to complete
 
 		// Always seed the channel with another url, just in case
 		//urls <- fmt.Sprintf("http://%s/org/oceanobservatories/rawdata/files/",host)
 
 		i++
 
-		if !resp {
-			return errors.New("Error from child")
-		} else if i >= count {
+    if i >= count {
 			return nil
-		}
+		} else if len(new_url) == 0 {
+      return errors.New("Error from child")
+		} else  {
+      urls <- new_url
+    }
 	}
 
 }
 
-func RandomWalkQuery(urls chan string, out chan bool, baseurl string) {
+func RandomWalkQuery(urls chan string, out chan string, baseurl string) {
 	fmt.Println("In random walker")
 	for url := range urls {
 
@@ -60,36 +65,44 @@ func RandomWalkQuery(urls chan string, out chan bool, baseurl string) {
 		if err != nil {
 			fmt.Printf("%d: ERROR: %s\n", url, err)
 			fmt.Printf("Error making request: %s\n", err.Error())
-			out <- false
+			out <- ""
 			return
 
 		}
 
 		defer resp.Body.Close()
-		// body, _ := ioutil.ReadAll(resp.Body)
-		// fmt.Printf("%d: RESPONSE: %v\n%s\n", i, resp, body)
 
-    // TODO:  Fix this
+		//body, _ := ioutil.ReadAll(resp.Body)
+		//fmt.Printf("RESPONSE: %v\n%s\n", resp, body)
+
 		// // Parse response
-		// decoder := json.NewDecoder(resp.Body)
-		// var listing lazycache.DirListing
-    //
-		// if err := decoder.Decode(&listing); err != nil {
-		// 	fmt.Println("Error reading response: %s\n", err.Error())
-		// 	out <- false
-		// 	return
-		// }
-		// //fmt.Printf("Has %d directories\n", len(listing.Directories))
-    //
-		// if len(listing.Directories) > 0 {
-    //
-		// 	urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
-		// 	//urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
-		// } else {
-    //   urls <- baseurl
-    // }
+		decoder := json.NewDecoder(resp.Body)
+		var listing struct {
+    	Path        string
+    	Files       []string
+    	Directories []string
+    }
 
-		fmt.Println("Good response")
-		out <- true
+  //  var bar interface{}
+
+		if err := decoder.Decode(&listing); err != nil && err != io.EOF {
+			fmt.Printf("Error reading response: %s\n", err.Error())
+			out <- ""
+			return
+		}
+
+    fmt.Println(listing)
+		fmt.Printf("Has %d directories\n", len(listing.Directories))
+
+
+//    fmt.Println("Good response")
+
+		if len(listing.Directories) > 0 {
+
+			out <- url + listing.Directories[rand.Intn(len(listing.Directories))]
+			//urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
+		} else {
+      out <- baseurl
+    }
 	}
 }
