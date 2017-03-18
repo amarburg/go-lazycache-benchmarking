@@ -1,35 +1,35 @@
 package lazycache_benchmarking
 
 import (
-  "fmt"
-  "io"
-  "errors"
-  //"io/ioutil"
-  "net/http"
-  "encoding/json"
-  "math/rand"
+	"errors"
+	"fmt"
+	"io"
+	//"io/ioutil"
+	"encoding/json"
+	"math/rand"
+	"net/http"
 )
 
-func RandomWalk( opts StressOptions, baseurl string ) error {
+func RandomWalk(opts StressOptions, baseurl string) error {
 
-  count := opts.Count()
-  parallelism := opts.Parallelism()
+	count := opts.Count()
+	parallelism := opts.Parallelism()
 
-  if parallelism > count {
-    fmt.Printf("Count %d less than parallelism %d, setting parallelism to %d\n", count, parallelism, count )
-    parallelism = count
-  }
+	if parallelism > count {
+		fmt.Printf("Count %d less than parallelism %d, setting parallelism to %d\n", count, parallelism, count)
+		parallelism = count
+	}
 
-  fmt.Printf("Random walk testing, count %d, parallelism %d\n", count, parallelism )
+	fmt.Printf("Random walk testing, count %d, parallelism %d\n", count, parallelism)
 
-  var urls = make(chan string, parallelism )
-  defer close(urls)
+	var urls = make(chan string, parallelism)
+	defer close(urls)
 
-  var out = make(chan string)
+	var out = make(chan string)
 
 	for i := 0; i < parallelism; i++ {
-		go RandomWalkQuery(urls,out, baseurl)
-    urls <- baseurl
+		go RandomWalkQuery(urls, out, baseurl)
+		urls <- baseurl
 	}
 
 	//urls <- fmt.Sprintf("http://%s/org/oceanobservatories/rawdata/files/RS03ASHS/PN03B/06-CAMHDA301/", host )
@@ -44,13 +44,13 @@ func RandomWalk( opts StressOptions, baseurl string ) error {
 
 		i++
 
-    if i >= count {
+		if i >= count {
 			return nil
 		} else if len(new_url) == 0 {
-      return errors.New("Error from child")
-		} else  {
-      urls <- new_url
-    }
+			return errors.New("Error from child")
+		} else {
+			urls <- new_url
+		}
 	}
 
 }
@@ -78,34 +78,33 @@ func RandomWalkQuery(urls chan string, out chan string, baseurl string) {
 		// // Parse response
 		decoder := json.NewDecoder(resp.Body)
 		var listing struct {
-    	Path        string
-    	Files       []string
-    	Directories []string
-    }
+			Path        string
+			Files       []string
+			Directories []string
+		}
 
-  //  var bar interface{}
+		//  var bar interface{}
 
 		if err := decoder.Decode(&listing); err != nil && err != io.EOF {
 
 			fmt.Printf("Query to %s; Error reading response (%d): %s\n", url, resp.StatusCode, err.Error())
-      // body, _ := ioutil.ReadAll(resp.Body)
-  		// fmt.Printf("RESPONSE: %v\n%s\n", resp, body)
+			// body, _ := ioutil.ReadAll(resp.Body)
+			// fmt.Printf("RESPONSE: %v\n%s\n", resp, body)
 			out <- ""
 			return
 		}
 
-    // fmt.Println(listing)
+		// fmt.Println(listing)
 		// fmt.Printf("Has %d directories\n", len(listing.Directories))
 
-
-//    fmt.Println("Good response")
+		//    fmt.Println("Good response")
 
 		if len(listing.Directories) > 0 {
 
 			out <- url + listing.Directories[rand.Intn(len(listing.Directories))] + "/"
 			//urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
 		} else {
-      out <- baseurl
-    }
+			out <- baseurl
+		}
 	}
 }
