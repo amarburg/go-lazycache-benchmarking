@@ -86,20 +86,23 @@ func RandomWalkQuery(urls chan string, out chan string, baseurl string) {
   //  var bar interface{}
 
 		if err := decoder.Decode(&listing); err != nil && err != io.EOF {
-			fmt.Printf("Error reading response: %s\n", err.Error())
+
+			fmt.Printf("Query to %s; Error reading response (%d): %s\n", url, resp.StatusCode, err.Error())
+      // body, _ := ioutil.ReadAll(resp.Body)
+  		// fmt.Printf("RESPONSE: %v\n%s\n", resp, body)
 			out <- ""
 			return
 		}
 
-    fmt.Println(listing)
-		fmt.Printf("Has %d directories\n", len(listing.Directories))
+    // fmt.Println(listing)
+		// fmt.Printf("Has %d directories\n", len(listing.Directories))
 
 
 //    fmt.Println("Good response")
 
 		if len(listing.Directories) > 0 {
 
-			out <- url + listing.Directories[rand.Intn(len(listing.Directories))]
+			out <- url + listing.Directories[rand.Intn(len(listing.Directories))] + "/"
 			//urls <- url + listing.Directories[rand.Intn(len(listing.Directories))]
 		} else {
       out <- baseurl
